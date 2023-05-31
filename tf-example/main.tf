@@ -4,8 +4,8 @@ resource "tanka_release" "example" {
   namespace = var.namespace
   config_inline = {
     key_inline: "inline value"
-    key_1: "value_1",
-    key_2: "value_2",
+    key_1: "value_1"
+    key_2: "value_2"
     key_list: "Not applicable in the inline config"
     key_nested: "Not applicable in the inline config"
   }

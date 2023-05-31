@@ -35,7 +35,8 @@ func resourceRelease() *schema.Resource {
 			},
 			"namespace": {
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
+				Default:  "default",
 			},
 			"source_path": {
 				Type:     schema.TypeString,
