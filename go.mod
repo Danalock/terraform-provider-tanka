@@ -1,10 +1,10 @@
-module gitlab.danalockapps.com/Backend/tools/terraform-provider-tanka.git
+module github.com/Danalock/terraform-provider-tanka.git
 
 go 1.19
 
 require (
 	github.com/grafana/tanka v0.25.0
-	github.com/hashicorp/terraform-plugin-log v0.8.0
+	github.com/hashicorp/terraform-plugin-log v0.9.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.26.1
 )
 
@@ -29,7 +29,7 @@ require (
 	github.com/hashicorp/go-plugin v1.4.9 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/hashicorp/go-version v1.6.0 // indirect
-	github.com/hashicorp/hcl/v2 v2.16.2 // indirect
+	github.com/hashicorp/hcl/v2 v2.17.0 // indirect
 	github.com/hashicorp/logutils v1.0.0 // indirect
 	github.com/hashicorp/terraform-plugin-go v0.15.0 // indirect
 	github.com/hashicorp/terraform-registry-address v0.2.0 // indirect
