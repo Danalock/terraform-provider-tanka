@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -51,11 +52,17 @@ func resourceRelease() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			"last_updated": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
 
 func resourceReleaseRead(ctx context.Context, d *schema.ResourceData, m any) diag.Diagnostics {
+
+	_ = d.Get("last_updated")
 
 	return nil
 }
@@ -87,6 +94,7 @@ func resourceReleaseCreate(ctx context.Context, d *schema.ResourceData, m any) d
 	}
 
 	d.SetId(name)
+	d.Set("last_updated", time.Now().Format(time.RFC3339))
 
 	return resourceReleaseRead(ctx, d, m)
 }
@@ -116,6 +124,8 @@ func resourceReleaseUpdate(ctx context.Context, d *schema.ResourceData, m any) d
 	if err != nil {
 		return diag.FromErr(err)
 	}
+
+	d.Set("last_updated", time.Now().Format(time.RFC3339))
 
 	return resourceReleaseRead(ctx, d, m)
 }

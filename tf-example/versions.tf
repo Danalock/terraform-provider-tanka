@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     tanka = {
-      source  = "danalock/tanka"
+      source  = "Danalock/tanka"
     }
   }
 }

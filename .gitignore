@@ -1,3 +1,6 @@
 log.txt
 terraform.tfstate*
 terraform-provider-tanka
+.terraform*
+
+dist/
