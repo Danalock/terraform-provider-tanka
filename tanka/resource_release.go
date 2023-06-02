@@ -68,8 +68,6 @@ func resourceRelease() *schema.Resource {
 
 func resourceReleaseRead(ctx context.Context, d *schema.ResourceData, m any) diag.Diagnostics {
 
-	_ = d.Get("last_updated")
-
 	return nil
 }
 
@@ -178,10 +176,6 @@ func getLocalConfig(config_input string) (config string, err error) {
 	switch config_type {
 	case "json":
 		config = config_input
-		// raw, err = json.Marshal(config_input)
-		// if err != nil {
-		// 	return
-		// }
 	case "file":
 		split := strings.Split(config_input, "://")
 		raw, err = os.ReadFile(split[1])
