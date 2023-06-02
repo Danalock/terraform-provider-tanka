@@ -1,7 +1,8 @@
 resource "tanka_release" "example" {
   name       = "tanka_example"
+  version    = random_id.random.hex
   api_server = var.api_server
-  # namespace = var.namespace
+  namespace  = var.namespace
   config_inline = {
     key_inline : "inline value"
     key_1 : "value_1"
@@ -23,13 +24,6 @@ resource "tanka_release" "example" {
       string_value : "value"
     },
   })
-
-  lifecycle {
-    replace_triggered_by = [
-      random_id.random.hex
-    ]
-  }
-
 }
 
 resource "random_id" "random" {

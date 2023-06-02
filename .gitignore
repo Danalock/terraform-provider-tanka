@@ -2,5 +2,6 @@ log.txt
 terraform.tfstate*
 terraform-provider-tanka
 .terraform*
+config.auto.tfvars
 
 dist/

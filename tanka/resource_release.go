@@ -39,6 +39,10 @@ func resourceRelease() *schema.Resource {
 				Optional: true,
 				Default:  "default",
 			},
+			"version": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 			"source_path": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -47,10 +51,12 @@ func resourceRelease() *schema.Resource {
 			"config_inline": {
 				Type:     schema.TypeMap,
 				Optional: true,
+				Default: "{}",
 			},
 			"config_local": {
 				Type:     schema.TypeString,
 				Optional: true,
+				Default: "{}",
 			},
 			"last_updated": {
 				Type:     schema.TypeString,

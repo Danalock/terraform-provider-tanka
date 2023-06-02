@@ -70,10 +70,11 @@ resource "tanka_release" "example" {
 
 ### Optional
 
-- `config_inline` (Map of String) Key/value map of configuration items in HCL.
-- `config_local` (String) Configuration override in arbitrary JSON format. The data can be provided inline with jsonencode or given as a file. Local file paths are prefixed with `file://` and remote sources with the correct protocol `http://` or `https://`. Remote sources must be publicly available at this time.
+- `config_inline` (Map of String) Key/value map of configuration items in HCL. Defaults to the empty object.
+- `config_local` (String) Configuration override in arbitrary JSON format. The data can be provided inline with jsonencode or given as a file. Local file paths are prefixed with `file://` and remote sources with the correct protocol `http://` or `https://`. Remote sources must be publicly available at this time. Defaults to the empty object.
 - `namespace` (String) The Kubernetes namespace to install the release into. Defaults to `default`
-- `source_path` (String) The location of the tanka main file. Defaults to `tanka/environments/default`
+- `source_path` (String) The location of the tanka main file. Defaults to `tanka/environments/default`.
+- `version` (String) A version number for the Tanka package. Examples could be a git commit SHA, or a random value to force update on every run. This value is not passed to the tanka application, if version information needs to be available to tanka it should be set as a subkey in one of the config objects.
 
 ### Read-Only
 
