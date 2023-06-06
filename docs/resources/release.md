@@ -16,7 +16,27 @@ Configuration is passed in either `config_inline` or `config_local`.
 
 The field `config_inline` is a simple key/value object expressed in hcl, whereas `config_local` is a json object given either directly or by loading a file from either a local (by prefixing with `file://`) or remote (by prefixing with `http://` or `https://`) source. The remote sources must be publicly accessible, at the time of writing there is no mechanism for providing authentication credentials to the remote server.
 
-Both config vars, together with `api_server` and `namespace` are passed to tanka as tla-string vars.
+Both config vars, together with `api_server` and `namespace` are passed to tanka as tla-code vars.
+
+This structure assumes that the tanka package is configured with [inline environments](https://tanka.dev/inline-environments) in order to dynamically set the `api_server` and `namespace`. A minimal setup for `main.jsonnet` using this provider could look like this:
+
+```jsonnet
+function(apiServer, namespace, config_inline = {}, config_local = {}) {
+
+  local config = config_inline + config_local,
+
+  apiVersion: 'tanka.dev/v1alpha1',
+  kind: 'Environment',
+  metadata: {
+    name: 'default',
+  },
+  spec: {
+    namespace: namespace,
+    apiServer: apiServer,
+  },
+```
+
+Note the camelCase in `apiServer` in the jsonnet context.
 
 ## Example usage - Direct override
 
