@@ -1,6 +1,6 @@
-# Tanka Provider for Terraform
+# Terraform Provider for Tanka
 
-This is an unofficial [Tanka](https://github.com/grafana/tanka) provider for [Terraform](https://www.terraform.io/).
+This is an unofficial [Terraform](https://www.terraform.io/) provider for [Tanka](https://github.com/grafana/tanka).
 
 This provider allows you to install and manage Tanka ressources in a Kubernetes cluster using Terraform.
 
