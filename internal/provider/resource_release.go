@@ -5,25 +5,25 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
+	// "encoding/json"
 	"fmt"
-	"io"
-	"net/http"
-	"os"
-	"strings"
-	"time"
+	// "io"
+	// "net/http"
+	// "os"
+	// "strings"
+	// "time"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+
+	// "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	// "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-
-	"github.com/grafana/tanka/pkg/jsonnet"
-	"github.com/grafana/tanka/pkg/tanka"
+	// "github.com/grafana/tanka/pkg/jsonnet"
+	// "github.com/grafana/tanka/pkg/tanka"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -36,24 +36,28 @@ func NewTankaReleaseResource() resource.Resource {
 
 // TankaReleaseResource defines the resource implementation.
 type TankaReleaseResource struct {
-	client *http.Client
+	client *Client
 }
 
 // TankaReleaseResourceModel describes the resource data model.
 type TankaReleaseResourceModel struct {
-	ConfigurableAttribute types.String `tfsdk:"configurable_attribute"`
-	Defaulted             types.String `tfsdk:"defaulted"`
-	Id                    types.String `tfsdk:"id"`
+	Id           types.String `tfsdk:"id"`
+	Name         types.String `tfsdk:"name"`
+	Version      types.String `tfsdk:"version"`
+	SourcePath   types.String `tfsdk:"source_path"`
+	ConfigInline types.Map    `tfsdk:"config_inline"`
+	ConfigLocal  types.String `tfsdk:"config_local"`
+	LastUpdated  types.String `tfsdk:"last_updated"`
 }
 
 func (r *TankaReleaseResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_tanka_release"
+	resp.TypeName = "tanka_release" //req.ProviderTypeName +
 }
 
 func (r *TankaReleaseResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
-		MarkdownDescription: "Example resource",
+		MarkdownDescription: "Tanka release",
 
 		Attributes: map[string]schema.Attribute{
 			"name": schema.StringAttribute{
@@ -69,19 +73,23 @@ func (r *TankaReleaseResource) Schema(ctx context.Context, req resource.SchemaRe
 			// },
 			"version": schema.StringAttribute{
 				MarkdownDescription: "The release version",
-				Optional: true,
+				Optional:            true,
 			},
 			"source_path": schema.StringAttribute{
 				MarkdownDescription: "Path to Tanka source",
-				Optional: true,
-				Default:  stringdefault.StaticString("tanka/environments/default"),
+				Optional:            true,
+				Computed:            true,
+				Default:             stringdefault.StaticString("tanka/environments/default"),
 			},
+			// Config inline could be allowed to have nested values - see https://developer.hashicorp.com/terraform/plugin/framework/handling-data/attributes/map-nested
 			"config_inline": schema.MapAttribute{
-				Optional: true,
+				Optional:    true,
+				ElementType: types.StringType,
 				// Default:  "{}",
 			},
 			"config_local": schema.StringAttribute{
 				Optional: true,
+				Computed: true,
 				Default:  stringdefault.StaticString("{}"),
 			},
 			"last_updated": schema.StringAttribute{
@@ -104,7 +112,7 @@ func (r *TankaReleaseResource) Configure(ctx context.Context, req resource.Confi
 		return
 	}
 
-	client, ok := req.ProviderData.(*http.Client)
+	client, ok := req.ProviderData.(*Client)
 
 	if !ok {
 		resp.Diagnostics.AddError(
@@ -136,10 +144,6 @@ func (r *TankaReleaseResource) Create(ctx context.Context, req resource.CreateRe
 	//     return
 	// }
 
-
-
-
-
 	// name := fmt.Sprintf("%v", d.Get("name"))
 
 	// api_server := fmt.Sprintf("%v", d.Get("api_server"))
@@ -166,13 +170,6 @@ func (r *TankaReleaseResource) Create(ctx context.Context, req resource.CreateRe
 
 	// d.SetId(name)
 	// d.Set("last_updated", time.Now().Format(time.RFC3339))
-
-
-
-
-
-
-
 
 	// For the purposes of this example code, hardcoding a response value to
 	// save into the Terraform state.

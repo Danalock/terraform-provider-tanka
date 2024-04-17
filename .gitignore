@@ -40,6 +40,7 @@ website/vendor
 log.txt
 terraform.tfstate*
 terraform-provider-tanka
+terraform-provider-tanka.git
 .terraform*
 config.auto.tfvars
 

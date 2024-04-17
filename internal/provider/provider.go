@@ -4,8 +4,12 @@
 package provider
 
 import (
+	// "bytes"
 	"context"
-	"net/http"
+	// "os"
+	// "os/exec"
+
+	// "net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/function"
@@ -34,14 +38,6 @@ type TankaProviderModel struct {
 	Token                types.String `tfsdk:"token"`
 }
 
-// provider "helm" {
-//   kubernetes {
-//     host                   = data.aws_eks_cluster.this.endpoint
-//     cluster_ca_certificate = base64decode(data.aws_eks_cluster.this.certificate_authority[0].data)
-//     token                  = data.aws_eks_cluster_auth.tools.token
-//   }
-// }
-
 func (p *TankaProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
 	resp.TypeName = "tanka"
 	resp.Version = p.version
@@ -54,7 +50,7 @@ func (p *TankaProvider) Schema(ctx context.Context, req provider.SchemaRequest, 
 				MarkdownDescription: "The kubernetes cluster endpoint",
 				Required:            true,
 			},
-			"cluster_certificate_authority": schema.StringAttribute{
+			"cluster_ca_certificate": schema.StringAttribute{
 				MarkdownDescription: "The certificate-authority for the cluster",
 				Required:            true,
 			},
@@ -69,17 +65,80 @@ func (p *TankaProvider) Schema(ctx context.Context, req provider.SchemaRequest, 
 func (p *TankaProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
 	var data TankaProviderModel
 
-	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
-
+	diags := req.Config.Get(ctx, &data)
+	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	// resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
+
+	// if resp.Diagnostics.HasError() {
+	// 	return
+	// }
+
+	endpoint := data.Endpoint.ValueString()
+	token := data.Token.ValueString()
+	cluster_ca_certificate := data.ClusterCaCertificate.ValueString()
+
+
+
+
+
+
+
+
+
+
+	// // set credentials
+	// cfgJSON := bytes.Buffer{}
+
+	// cmd := exec.Command("kubectl", "config", "set-credentials", endpoint, "--token", token)
+	// cmd.Stdout = &cfgJSON
+	// cmd.Stderr = os.Stderr
+	// if err := cmd.Run(); err != nil {
+	// 	return
+	// }
+
+	// cmd = exec.Command("kubectl", "config", "set-context", endpoint, "--cluster", endpoint)
+	// cmd.Stdout = &cfgJSON
+	// cmd.Stderr = os.Stderr
+	// if err := cmd.Run(); err != nil {
+	// 	return
+	// }
+
+	// cmd = exec.Command("kubectl", "config", "set-cluster", endpoint, "--certificate-authority", ca, "--server", endpoint)
+	// cmd.Stdout = &cfgJSON
+	// cmd.Stderr = os.Stderr
+	// if err := cmd.Run(); err != nil {
+	// 	return
+	// }
+
+
+
+
+
+
+
+
 
 	// Configuration values are now available.
 	// if data.Endpoint.IsNull() { /* ... */ }
 
 	// Example client configuration for data sources and resources
-	client := http.DefaultClient
+	// client := http.DefaultClient
+
+	client, err := NewClient(&endpoint, &token, &cluster_ca_certificate)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Unable to Create Tanka API Client",
+			"An unexpected error occurred when creating the Tanka API client. "+
+				"If the error is not clear, please contact the provider developers.\n\n"+
+				"Tanka Client Error: "+err.Error(),
+		)
+		return
+	}
+
 	resp.DataSourceData = client
 	resp.ResourceData = client
 }
