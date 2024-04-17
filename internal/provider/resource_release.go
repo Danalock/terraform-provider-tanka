@@ -60,6 +60,9 @@ func (r *TankaReleaseResource) Schema(ctx context.Context, req resource.SchemaRe
 		MarkdownDescription: "Tanka release",
 
 		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
+				Computed: true,
+			},
 			"name": schema.StringAttribute{
 				MarkdownDescription: "The name of the Tanka release",
 				Required:            true,

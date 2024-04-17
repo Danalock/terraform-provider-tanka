@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 // Client -
@@ -77,21 +78,32 @@ func NewClient(endpoint, token, cluster_ca_certificate *string) (client *Client,
 func (c *Client) setCredentials() {
 	cfgJSON := bytes.Buffer{}
 
-	cmd := exec.Command("kubectl", "config", "set-credentials", c.Endpoint, "--token", c.Token)
+	cluster_config_identifier := strings.Replace(c.Endpoint, ".", "_", -1)
+
+	cmd := exec.Command("kubectl", "config", "set-credentials", cluster_config_identifier, "--token", c.Token)
 	cmd.Stdout = &cfgJSON
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
 		return
 	}
 
-	cmd = exec.Command("kubectl", "config", "set-context", c.Endpoint, "--cluster", c.Endpoint)
+	cmd = exec.Command("kubectl", "config", "set-context", cluster_config_identifier, "--cluster", cluster_config_identifier, "--user", cluster_config_identifier)
 	cmd.Stdout = &cfgJSON
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
 		return
 	}
 
-	cmd = exec.Command("kubectl", "config", "set-cluster", c.Endpoint, "--certificate-authority", c.ClusterCaCertificate, "--server", c.Endpoint)
+	cmd = exec.Command("kubectl", "config", "set-cluster", cluster_config_identifier, "--server", c.Endpoint)
+	cmd.Stdout = &cfgJSON
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		return
+	}
+
+	// "--certificate-authority-data", c.ClusterCaCertificate,
+
+	cmd = exec.Command("kubectl", "config", "set", "clusters."+cluster_config_identifier+".certificate-authority-data", c.ClusterCaCertificate)
 	cmd.Stdout = &cfgJSON
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
