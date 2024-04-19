@@ -7,22 +7,15 @@ import (
 	"context"
 	// "encoding/json"
 	"time"
-
-	// "encoding/json"
 	"fmt"
-	// "io"
-	// "net/http"
-	// "os"
-	// "strings"
-	// "time"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 
-	// "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
-	// "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -63,9 +56,6 @@ func (r *TankaReleaseResource) Schema(ctx context.Context, req resource.SchemaRe
 		MarkdownDescription: "Tanka release",
 
 		Attributes: map[string]schema.Attribute{
-			"id": schema.StringAttribute{
-				Computed: true,
-			},
 			"name": schema.StringAttribute{
 				MarkdownDescription: "The name of the Tanka release",
 				Required:            true,
@@ -104,13 +94,13 @@ func (r *TankaReleaseResource) Schema(ctx context.Context, req resource.SchemaRe
 			"last_updated": schema.StringAttribute{
 				Computed: true,
 			},
-			// "id": schema.StringAttribute{
-			// 	Computed:            true,
-			// 	MarkdownDescription: "Example identifier",
-			// 	PlanModifiers: []planmodifier.String{
-			// 		stringplanmodifier.UseStateForUnknown(),
-			// 	},
-			// },
+			"id": schema.StringAttribute{
+				Computed:            true,
+				MarkdownDescription: "Identifier",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
 		},
 	}
 }
@@ -144,22 +134,6 @@ func (r *TankaReleaseResource) Create(ctx context.Context, req resource.CreateRe
 	if resp.Diagnostics.HasError() {
 		return
 	}
-
-	// If applicable, this is a great opportunity to initialize any necessary
-	// provider client data and make a call using it.
-	// httpResp, err := r.client.Do(httpReq)
-	// if err != nil {
-	//     resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create example, got error: %s", err))
-	//     return
-	// }
-
-	// name := fmt.Sprintf("%v", d.Get("name"))
-
-	// api_server := fmt.Sprintf("%v", d.Get("api_server"))
-	// namespace := fmt.Sprintf("%v", d.Get("namespace"))
-	// source_path := fmt.Sprintf("%v", d.Get("source_path"))
-	// config_inline := d.Get("config_inline").(map[string]any)
-	// config_local := fmt.Sprintf("%v", d.Get("config_local"))
 
 
 
