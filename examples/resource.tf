@@ -1,7 +1,5 @@
 resource "tanka_release" "example" {
-  name     = "tanka_example"
-  endpoint = var.endpoint
-  version  = "0.0.1"
+  version = "123"
   config_inline = {
     key_inline : "inline value"
     key_1 : "value_1"

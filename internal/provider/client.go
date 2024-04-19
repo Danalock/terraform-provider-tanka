@@ -13,7 +13,6 @@ import (
 	"github.com/grafana/tanka/pkg/tanka"
 )
 
-// Client -
 type Client struct {
 	Endpoint             string
 	Token                string

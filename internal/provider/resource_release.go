@@ -6,8 +6,8 @@ package provider
 import (
 	"context"
 	// "encoding/json"
-	"time"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -36,8 +36,8 @@ type TankaReleaseResource struct {
 // TankaReleaseResourceModel describes the resource data model.
 type TankaReleaseResourceModel struct {
 	Id           types.String `tfsdk:"id"`
-	Name         types.String `tfsdk:"name"`
-	Endpoint     types.String `tfsdk:"endpoint"`
+	// Name         types.String `tfsdk:"name"`
+	// Endpoint     types.String `tfsdk:"endpoint"`
 	Namespace    types.String `tfsdk:"namespace"`
 	Version      types.String `tfsdk:"version"`
 	SourcePath   types.String `tfsdk:"source_path"`
@@ -56,14 +56,14 @@ func (r *TankaReleaseResource) Schema(ctx context.Context, req resource.SchemaRe
 		MarkdownDescription: "Tanka release",
 
 		Attributes: map[string]schema.Attribute{
-			"name": schema.StringAttribute{
-				MarkdownDescription: "The name of the Tanka release",
-				Required:            true,
-			},
-			"endpoint": schema.StringAttribute{
-				MarkdownDescription: "The cluster endpoint / apiServer",
-				Required:            true,
-			},
+			// "name": schema.StringAttribute{
+			// 	MarkdownDescription: "The name of the Tanka release",
+			// 	Required:            true,
+			// },
+			// "endpoint": schema.StringAttribute{
+			// 	MarkdownDescription: "The cluster endpoint / apiServer",
+			// 	Required:            true,
+			// },
 			"namespace": schema.StringAttribute{
 				MarkdownDescription: "The cluster namespace to apply against",
 				Optional:            true,
@@ -73,6 +73,8 @@ func (r *TankaReleaseResource) Schema(ctx context.Context, req resource.SchemaRe
 			"version": schema.StringAttribute{
 				MarkdownDescription: "The release version",
 				Optional:            true,
+				Computed:            true,
+				Default:             stringdefault.StaticString("0.0.1"),
 			},
 			"source_path": schema.StringAttribute{
 				MarkdownDescription: "Path to Tanka source",
@@ -135,10 +137,6 @@ func (r *TankaReleaseResource) Create(ctx context.Context, req resource.CreateRe
 		return
 	}
 
-
-
-
-
 	// config_inline_map, _ := data.ConfigInline.ToMapValue(ctx)
 
 	// raw, err := json.Marshal(config_inline_map)
@@ -155,13 +153,13 @@ func (r *TankaReleaseResource) Create(ctx context.Context, req resource.CreateRe
 		return
 	}
 
-	err = r.client.Apply(data.Endpoint.ValueString(), data.Namespace.ValueString(), ci, cl, data.SourcePath.ValueString())
+	err = r.client.Apply(r.client.Endpoint, data.Namespace.ValueString(), ci, cl, data.SourcePath.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("Apply Error", fmt.Sprintf("Unable to apply tanka package, got error: %s", err))
 		return
 	}
 
-	data.Id = data.Name
+	data.Id = types.StringValue(r.client.Endpoint + "_" + randSeq(6))
 	data.LastUpdated = types.StringValue(time.Now().Format(time.RFC3339))
 
 	// Write logs using the tflog package
@@ -212,7 +210,7 @@ func (r *TankaReleaseResource) Update(ctx context.Context, req resource.UpdateRe
 		return
 	}
 
-	err = r.client.Apply(data.Endpoint.ValueString(), data.Namespace.ValueString(), ci, cl, data.SourcePath.ValueString())
+	err = r.client.Apply(r.client.Endpoint, data.Namespace.ValueString(), ci, cl, data.SourcePath.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("Apply Error", fmt.Sprintf("Unable to apply tanka package, got error: %s", err))
 		return
@@ -254,7 +252,7 @@ func (r *TankaReleaseResource) Delete(ctx context.Context, req resource.DeleteRe
 		return
 	}
 
-	err = r.client.Delete(data.Endpoint.ValueString(), data.Namespace.ValueString(), ci, cl, data.SourcePath.ValueString())
+	err = r.client.Delete(r.client.Endpoint, data.Namespace.ValueString(), ci, cl, data.SourcePath.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("Delete Error", fmt.Sprintf("Unable to delete tanka package, got error: %s", err))
 		return
