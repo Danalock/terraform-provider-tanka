@@ -6,6 +6,9 @@ package provider
 import (
 	"context"
 	// "encoding/json"
+	"time"
+
+	// "encoding/json"
 	"fmt"
 	// "io"
 	// "net/http"
@@ -22,8 +25,6 @@ import (
 	// "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	// "github.com/grafana/tanka/pkg/jsonnet"
-	// "github.com/grafana/tanka/pkg/tanka"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -43,6 +44,8 @@ type TankaReleaseResource struct {
 type TankaReleaseResourceModel struct {
 	Id           types.String `tfsdk:"id"`
 	Name         types.String `tfsdk:"name"`
+	Endpoint     types.String `tfsdk:"endpoint"`
+	Namespace    types.String `tfsdk:"namespace"`
 	Version      types.String `tfsdk:"version"`
 	SourcePath   types.String `tfsdk:"source_path"`
 	ConfigInline types.Map    `tfsdk:"config_inline"`
@@ -67,13 +70,16 @@ func (r *TankaReleaseResource) Schema(ctx context.Context, req resource.SchemaRe
 				MarkdownDescription: "The name of the Tanka release",
 				Required:            true,
 			},
-			// "api_server": schema.StringAttribute{
-			// 	Required: true,
-			// },
-			// "namespace": schema.StringAttribute{
-			// 	Optional: true,
-			// 	Default:  stringdefault.StaticString("default"),
-			// },
+			"endpoint": schema.StringAttribute{
+				MarkdownDescription: "The cluster endpoint / apiServer",
+				Required:            true,
+			},
+			"namespace": schema.StringAttribute{
+				MarkdownDescription: "The cluster namespace to apply against",
+				Optional:            true,
+				Computed:            true,
+				Default:             stringdefault.StaticString("default"),
+			},
 			"version": schema.StringAttribute{
 				MarkdownDescription: "The release version",
 				Optional:            true,
@@ -155,28 +161,34 @@ func (r *TankaReleaseResource) Create(ctx context.Context, req resource.CreateRe
 	// config_inline := d.Get("config_inline").(map[string]any)
 	// config_local := fmt.Sprintf("%v", d.Get("config_local"))
 
-	// raw, err := json.Marshal(config_inline)
+
+
+
+
+	// config_inline_map, _ := data.ConfigInline.ToMapValue(ctx)
+
+	// raw, err := json.Marshal(config_inline_map)
 	// if err != nil {
-	// 	return diag.FromErr(err)
+	// 	resp.Diagnostics.AddError("Marshal Error", fmt.Sprintf("Unable to marshal json data, got error: %s", err))
+	// 	return
 	// }
 	// ci := string(raw[:])
+	ci := ""
 
-	// cl, err := getLocalConfig(config_local)
-	// if err != nil {
-	// 	return diag.FromErr(err)
-	// }
+	cl, err := r.client.getLocalConfig(data.ConfigLocal.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError("Parse Error", fmt.Sprintf("Unable to parse json data, got error: %s", err))
+		return
+	}
 
-	// err = tankaApply(api_server, namespace, ci, cl, source_path)
-	// if err != nil {
-	// 	return diag.FromErr(err)
-	// }
+	err = r.client.Apply(data.Endpoint.ValueString(), data.Namespace.ValueString(), ci, cl, data.SourcePath.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError("Apply Error", fmt.Sprintf("Unable to apply tanka package, got error: %s", err))
+		return
+	}
 
-	// d.SetId(name)
-	// d.Set("last_updated", time.Now().Format(time.RFC3339))
-
-	// For the purposes of this example code, hardcoding a response value to
-	// save into the Terraform state.
-	data.Id = types.StringValue("example-id")
+	data.Id = data.Name
+	data.LastUpdated = types.StringValue(time.Now().Format(time.RFC3339))
 
 	// Write logs using the tflog package
 	// Documentation: https://terraform.io/plugin/log
@@ -196,14 +208,6 @@ func (r *TankaReleaseResource) Read(ctx context.Context, req resource.ReadReques
 		return
 	}
 
-	// If applicable, this is a great opportunity to initialize any necessary
-	// provider client data and make a call using it.
-	// httpResp, err := r.client.Do(httpReq)
-	// if err != nil {
-	//     resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read example, got error: %s", err))
-	//     return
-	// }
-
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -218,13 +222,33 @@ func (r *TankaReleaseResource) Update(ctx context.Context, req resource.UpdateRe
 		return
 	}
 
-	// If applicable, this is a great opportunity to initialize any necessary
-	// provider client data and make a call using it.
-	// httpResp, err := r.client.Do(httpReq)
+	// config_inline_map, _ := data.ConfigInline.ToMapValue(ctx)
+
+	// raw, err := json.Marshal(config_inline_map)
 	// if err != nil {
-	//     resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update example, got error: %s", err))
-	//     return
+	// 	resp.Diagnostics.AddError("Marshal Error", fmt.Sprintf("Unable to marshal json data, got error: %s", err))
+	// 	return
 	// }
+	// ci := string(raw[:])
+	ci := ""
+
+	cl, err := r.client.getLocalConfig(data.ConfigLocal.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError("Parse Error", fmt.Sprintf("Unable to parse json data, got error: %s", err))
+		return
+	}
+
+	err = r.client.Apply(data.Endpoint.ValueString(), data.Namespace.ValueString(), ci, cl, data.SourcePath.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError("Apply Error", fmt.Sprintf("Unable to apply tanka package, got error: %s", err))
+		return
+	}
+
+	data.LastUpdated = types.StringValue(time.Now().Format(time.RFC3339))
+
+	// Write logs using the tflog package
+	// Documentation: https://terraform.io/plugin/log
+	tflog.Trace(ctx, "updated a resource")
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -240,13 +264,34 @@ func (r *TankaReleaseResource) Delete(ctx context.Context, req resource.DeleteRe
 		return
 	}
 
-	// If applicable, this is a great opportunity to initialize any necessary
-	// provider client data and make a call using it.
-	// httpResp, err := r.client.Do(httpReq)
+	// config_inline_map, _ := data.ConfigInline.ToMapValue(ctx)
+
+	// raw, err := json.Marshal(config_inline_map)
 	// if err != nil {
-	//     resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to delete example, got error: %s", err))
-	//     return
+	// 	resp.Diagnostics.AddError("Marshal Error", fmt.Sprintf("Unable to marshal json data, got error: %s", err))
+	// 	return
 	// }
+	// ci := string(raw[:])
+	ci := ""
+
+	cl, err := r.client.getLocalConfig(data.ConfigLocal.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError("Parse Error", fmt.Sprintf("Unable to parse json data, got error: %s", err))
+		return
+	}
+
+	err = r.client.Delete(data.Endpoint.ValueString(), data.Namespace.ValueString(), ci, cl, data.SourcePath.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError("Delete Error", fmt.Sprintf("Unable to delete tanka package, got error: %s", err))
+		return
+	}
+
+	// Write logs using the tflog package
+	// Documentation: https://terraform.io/plugin/log
+	tflog.Trace(ctx, "deleted a resource")
+
+	// Save updated data into Terraform state
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *TankaReleaseResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {

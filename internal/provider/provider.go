@@ -4,12 +4,7 @@
 package provider
 
 import (
-	// "bytes"
 	"context"
-	// "os"
-	// "os/exec"
-
-	// "net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/function"
@@ -71,62 +66,9 @@ func (p *TankaProvider) Configure(ctx context.Context, req provider.ConfigureReq
 		return
 	}
 
-	// resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
-
-	// if resp.Diagnostics.HasError() {
-	// 	return
-	// }
-
 	endpoint := data.Endpoint.ValueString()
 	token := data.Token.ValueString()
 	cluster_ca_certificate := data.ClusterCaCertificate.ValueString()
-
-
-
-
-
-
-
-
-
-
-	// // set credentials
-	// cfgJSON := bytes.Buffer{}
-
-	// cmd := exec.Command("kubectl", "config", "set-credentials", endpoint, "--token", token)
-	// cmd.Stdout = &cfgJSON
-	// cmd.Stderr = os.Stderr
-	// if err := cmd.Run(); err != nil {
-	// 	return
-	// }
-
-	// cmd = exec.Command("kubectl", "config", "set-context", endpoint, "--cluster", endpoint)
-	// cmd.Stdout = &cfgJSON
-	// cmd.Stderr = os.Stderr
-	// if err := cmd.Run(); err != nil {
-	// 	return
-	// }
-
-	// cmd = exec.Command("kubectl", "config", "set-cluster", endpoint, "--certificate-authority", ca, "--server", endpoint)
-	// cmd.Stdout = &cfgJSON
-	// cmd.Stderr = os.Stderr
-	// if err := cmd.Run(); err != nil {
-	// 	return
-	// }
-
-
-
-
-
-
-
-
-
-	// Configuration values are now available.
-	// if data.Endpoint.IsNull() { /* ... */ }
-
-	// Example client configuration for data sources and resources
-	// client := http.DefaultClient
 
 	client, err := NewClient(&endpoint, &token, &cluster_ca_certificate)
 	if err != nil {

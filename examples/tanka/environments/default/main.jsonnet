@@ -24,10 +24,10 @@ function(apiServer, namespace, config_inline = {}, config_local = {}) {
   data: {
     terraformprovidertest: configMap.new('terraformprovidertest', {
       'key_jsonnet_default': config.key_jsonnet_default,
-      'key_inline': config.key_inline,
+      // 'key_inline': config.key_inline,
       'key_local': config.key_local,
       'key_1': config.key_1,
-      'key_2': config.key_2,
+      // 'key_2': config.key_2,
     }),
   },
 }
