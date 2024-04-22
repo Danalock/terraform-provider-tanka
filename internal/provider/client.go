@@ -35,6 +35,7 @@ func NewClient(endpoint, token, cluster_ca_certificate *string) (client *Client,
 func (c *Client) setCredentials() {
 	cfgJSON := bytes.Buffer{}
 
+	// A kube config context name creates issues if it contains dots
 	cluster_config_identifier := strings.Replace(c.Endpoint, ".", "_", -1)
 
 	cmd := exec.Command("kubectl", "config", "set-credentials", cluster_config_identifier, "--token", c.Token)
@@ -71,8 +72,8 @@ func createBaseOpts(api_server, namespace, config_inline, config_local string) (
 	var TLACode jsonnet.InjectedCode
 	TLACode.Set("apiServer", "\""+api_server+"\"")
 	TLACode.Set("namespace", "\""+namespace+"\"")
-	_ = config_inline
-	// TLACode.Set("config_inline", config_inline)
+	// _ = config_inline
+	TLACode.Set("config_inline", config_inline)
 	TLACode.Set("config_local", config_local)
 	opts.TLACode = TLACode
 
@@ -144,7 +145,6 @@ func (c *Client) getLocalConfig(config_input string) (config string, err error) 
 		return
 	}
 
-
 	return
 }
 
@@ -166,79 +166,3 @@ func getHttpContent(url string) ([]byte, error) {
 
 	return data, nil
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // HostURL - Default Hashicups URL
-// const HostURL string = "http://localhost:19090"
-
-// // AuthStruct -
-// type AuthStruct struct {
-// 	Username string `json:"username"`
-// 	Password string `json:"password"`
-// }
-
-// // AuthResponse -
-// type AuthResponse struct {
-// 	UserID   int    `json:"user_id`
-// 	Username string `json:"username`
-// 	Token    string `json:"token"`
-// }
-
-// NewClient -
-// func NewClient(host, username, password *string) (*Client, error) {
-// 	c := Client{
-// 		HTTPClient: &http.Client{Timeout: 10 * time.Second},
-// 		// Default Hashicups URL
-// 		HostURL: HostURL,
-// 		Auth: AuthStruct{
-// 			Username: *username,
-// 			Password: *password,
-// 		},
-// 	}
-
-// 	if host != nil {
-// 		c.HostURL = *host
-// 	}
-
-// 	ar, err := c.SignIn()
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	c.Token = ar.Token
-
-// 	return &c, nil
-// }
-
-
-// func (c *Client) doRequest(req *http.Request) ([]byte, error) {
-// 	req.Header.Set("Authorization", c.Token)
-
-// 	res, err := c.HTTPClient.Do(req)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	defer res.Body.Close()
-
-// 	body, err := ioutil.ReadAll(res.Body)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	if res.StatusCode != http.StatusOK {
-// 		return nil, fmt.Errorf("status: %d, body: %s", res.StatusCode, body)
-// 	}
-
-// 	return body, err
-// }

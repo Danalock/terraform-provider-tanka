@@ -5,7 +5,7 @@ package provider
 
 import (
 	"context"
-	// "encoding/json"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -36,8 +36,6 @@ type TankaReleaseResource struct {
 // TankaReleaseResourceModel describes the resource data model.
 type TankaReleaseResourceModel struct {
 	Id           types.String `tfsdk:"id"`
-	// Name         types.String `tfsdk:"name"`
-	// Endpoint     types.String `tfsdk:"endpoint"`
 	Namespace    types.String `tfsdk:"namespace"`
 	Version      types.String `tfsdk:"version"`
 	SourcePath   types.String `tfsdk:"source_path"`
@@ -56,14 +54,6 @@ func (r *TankaReleaseResource) Schema(ctx context.Context, req resource.SchemaRe
 		MarkdownDescription: "Tanka release",
 
 		Attributes: map[string]schema.Attribute{
-			// "name": schema.StringAttribute{
-			// 	MarkdownDescription: "The name of the Tanka release",
-			// 	Required:            true,
-			// },
-			// "endpoint": schema.StringAttribute{
-			// 	MarkdownDescription: "The cluster endpoint / apiServer",
-			// 	Required:            true,
-			// },
 			"namespace": schema.StringAttribute{
 				MarkdownDescription: "The cluster namespace to apply against",
 				Optional:            true,
@@ -139,13 +129,13 @@ func (r *TankaReleaseResource) Create(ctx context.Context, req resource.CreateRe
 
 	// config_inline_map, _ := data.ConfigInline.ToMapValue(ctx)
 
-	// raw, err := json.Marshal(config_inline_map)
-	// if err != nil {
-	// 	resp.Diagnostics.AddError("Marshal Error", fmt.Sprintf("Unable to marshal json data, got error: %s", err))
-	// 	return
-	// }
-	// ci := string(raw[:])
-	ci := ""
+	raw, err := json.Marshal(data.ConfigInline.Elements())
+	if err != nil {
+		resp.Diagnostics.AddError("Marshal Error", fmt.Sprintf("Unable to marshal json data, got error: %s", err))
+		return
+	}
+	ci := string(raw[:])
+	// ci := ""
 
 	cl, err := r.client.getLocalConfig(data.ConfigLocal.ValueString())
 	if err != nil {
@@ -196,13 +186,13 @@ func (r *TankaReleaseResource) Update(ctx context.Context, req resource.UpdateRe
 
 	// config_inline_map, _ := data.ConfigInline.ToMapValue(ctx)
 
-	// raw, err := json.Marshal(config_inline_map)
-	// if err != nil {
-	// 	resp.Diagnostics.AddError("Marshal Error", fmt.Sprintf("Unable to marshal json data, got error: %s", err))
-	// 	return
-	// }
-	// ci := string(raw[:])
-	ci := ""
+	raw, err := json.Marshal(data.ConfigInline.Elements())
+	if err != nil {
+		resp.Diagnostics.AddError("Marshal Error", fmt.Sprintf("Unable to marshal json data, got error: %s", err))
+		return
+	}
+	ci := string(raw[:])
+	// ci := ""
 
 	cl, err := r.client.getLocalConfig(data.ConfigLocal.ValueString())
 	if err != nil {
@@ -238,13 +228,13 @@ func (r *TankaReleaseResource) Delete(ctx context.Context, req resource.DeleteRe
 
 	// config_inline_map, _ := data.ConfigInline.ToMapValue(ctx)
 
-	// raw, err := json.Marshal(config_inline_map)
-	// if err != nil {
-	// 	resp.Diagnostics.AddError("Marshal Error", fmt.Sprintf("Unable to marshal json data, got error: %s", err))
-	// 	return
-	// }
-	// ci := string(raw[:])
-	ci := ""
+	raw, err := json.Marshal(data.ConfigInline.Elements())
+	if err != nil {
+		resp.Diagnostics.AddError("Marshal Error", fmt.Sprintf("Unable to marshal json data, got error: %s", err))
+		return
+	}
+	ci := string(raw[:])
+	// ci := ""
 
 	cl, err := r.client.getLocalConfig(data.ConfigLocal.ValueString())
 	if err != nil {
