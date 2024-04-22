@@ -5,7 +5,7 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
+	// "encoding/json"
 	"fmt"
 	"time"
 
@@ -35,13 +35,13 @@ type TankaReleaseResource struct {
 
 // TankaReleaseResourceModel describes the resource data model.
 type TankaReleaseResourceModel struct {
-	Id           types.String `tfsdk:"id"`
-	Namespace    types.String `tfsdk:"namespace"`
-	Version      types.String `tfsdk:"version"`
-	SourcePath   types.String `tfsdk:"source_path"`
-	ConfigInline types.Map    `tfsdk:"config_inline"`
-	ConfigLocal  types.String `tfsdk:"config_local"`
-	LastUpdated  types.String `tfsdk:"last_updated"`
+	Id             types.String `tfsdk:"id"`
+	Namespace      types.String `tfsdk:"namespace"`
+	Version        types.String `tfsdk:"version"`
+	SourcePath     types.String `tfsdk:"source_path"`
+	Config         types.String `tfsdk:"config"`
+	ConfigOverride types.String `tfsdk:"config_override"`
+	LastUpdated    types.String `tfsdk:"last_updated"`
 }
 
 func (r *TankaReleaseResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -64,7 +64,7 @@ func (r *TankaReleaseResource) Schema(ctx context.Context, req resource.SchemaRe
 				MarkdownDescription: "The release version",
 				Optional:            true,
 				Computed:            true,
-				Default:             stringdefault.StaticString("0.0.1"),
+				Default:             stringdefault.StaticString("0"),
 			},
 			"source_path": schema.StringAttribute{
 				MarkdownDescription: "Path to Tanka source",
@@ -72,13 +72,12 @@ func (r *TankaReleaseResource) Schema(ctx context.Context, req resource.SchemaRe
 				Computed:            true,
 				Default:             stringdefault.StaticString("tanka/environments/default"),
 			},
-			// Config inline could be allowed to have nested values - see https://developer.hashicorp.com/terraform/plugin/framework/handling-data/attributes/map-nested
-			"config_inline": schema.MapAttribute{
-				Optional:    true,
-				ElementType: types.StringType,
-				// Default:  "{}",
+			"config": schema.StringAttribute{
+				Optional: true,
+				Computed: true,
+				Default:  stringdefault.StaticString("{}"),
 			},
-			"config_local": schema.StringAttribute{
+			"config_override": schema.StringAttribute{
 				Optional: true,
 				Computed: true,
 				Default:  stringdefault.StaticString("{}"),
@@ -127,23 +126,19 @@ func (r *TankaReleaseResource) Create(ctx context.Context, req resource.CreateRe
 		return
 	}
 
-	// config_inline_map, _ := data.ConfigInline.ToMapValue(ctx)
-
-	raw, err := json.Marshal(data.ConfigInline.Elements())
+	config, err := r.client.parseConfig(data.Config.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("Marshal Error", fmt.Sprintf("Unable to marshal json data, got error: %s", err))
+		resp.Diagnostics.AddError("Marshal Error", fmt.Sprintf("Unable to parse json data, got error: %s", err))
 		return
 	}
-	ci := string(raw[:])
-	// ci := ""
 
-	cl, err := r.client.getLocalConfig(data.ConfigLocal.ValueString())
+	config_override, err := r.client.parseConfig(data.ConfigOverride.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("Parse Error", fmt.Sprintf("Unable to parse json data, got error: %s", err))
 		return
 	}
 
-	err = r.client.Apply(r.client.Endpoint, data.Namespace.ValueString(), ci, cl, data.SourcePath.ValueString())
+	err = r.client.Apply(r.client.Endpoint, data.Namespace.ValueString(), config, config_override, data.SourcePath.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("Apply Error", fmt.Sprintf("Unable to apply tanka package, got error: %s", err))
 		return
@@ -184,23 +179,19 @@ func (r *TankaReleaseResource) Update(ctx context.Context, req resource.UpdateRe
 		return
 	}
 
-	// config_inline_map, _ := data.ConfigInline.ToMapValue(ctx)
-
-	raw, err := json.Marshal(data.ConfigInline.Elements())
+	config, err := r.client.parseConfig(data.Config.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("Marshal Error", fmt.Sprintf("Unable to marshal json data, got error: %s", err))
+		resp.Diagnostics.AddError("Marshal Error", fmt.Sprintf("Unable to parse json data, got error: %s", err))
 		return
 	}
-	ci := string(raw[:])
-	// ci := ""
 
-	cl, err := r.client.getLocalConfig(data.ConfigLocal.ValueString())
+	config_override, err := r.client.parseConfig(data.ConfigOverride.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("Parse Error", fmt.Sprintf("Unable to parse json data, got error: %s", err))
 		return
 	}
 
-	err = r.client.Apply(r.client.Endpoint, data.Namespace.ValueString(), ci, cl, data.SourcePath.ValueString())
+	err = r.client.Apply(r.client.Endpoint, data.Namespace.ValueString(), config, config_override, data.SourcePath.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("Apply Error", fmt.Sprintf("Unable to apply tanka package, got error: %s", err))
 		return
@@ -226,23 +217,19 @@ func (r *TankaReleaseResource) Delete(ctx context.Context, req resource.DeleteRe
 		return
 	}
 
-	// config_inline_map, _ := data.ConfigInline.ToMapValue(ctx)
-
-	raw, err := json.Marshal(data.ConfigInline.Elements())
+	config, err := r.client.parseConfig(data.Config.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("Marshal Error", fmt.Sprintf("Unable to marshal json data, got error: %s", err))
+		resp.Diagnostics.AddError("Marshal Error", fmt.Sprintf("Unable to parse json data, got error: %s", err))
 		return
 	}
-	ci := string(raw[:])
-	// ci := ""
 
-	cl, err := r.client.getLocalConfig(data.ConfigLocal.ValueString())
+	config_override, err := r.client.parseConfig(data.ConfigOverride.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("Parse Error", fmt.Sprintf("Unable to parse json data, got error: %s", err))
 		return
 	}
 
-	err = r.client.Delete(r.client.Endpoint, data.Namespace.ValueString(), ci, cl, data.SourcePath.ValueString())
+	err = r.client.Delete(r.client.Endpoint, data.Namespace.ValueString(), config, config_override, data.SourcePath.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("Delete Error", fmt.Sprintf("Unable to delete tanka package, got error: %s", err))
 		return

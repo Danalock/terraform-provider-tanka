@@ -67,14 +67,13 @@ func (c *Client) setCredentials() {
 	}
 }
 
-func createBaseOpts(api_server, namespace, config_inline, config_local string) (opts tanka.ApplyBaseOpts, err error) {
+func createBaseOpts(api_server, namespace, config, config_override string) (opts tanka.ApplyBaseOpts, err error) {
 
 	var TLACode jsonnet.InjectedCode
 	TLACode.Set("apiServer", "\""+api_server+"\"")
 	TLACode.Set("namespace", "\""+namespace+"\"")
-	// _ = config_inline
-	TLACode.Set("config_inline", config_inline)
-	TLACode.Set("config_local", config_local)
+	TLACode.Set("config", config)
+	TLACode.Set("config_override", config_override)
 	opts.TLACode = TLACode
 
 	opts.AutoApprove = "true"
@@ -84,8 +83,8 @@ func createBaseOpts(api_server, namespace, config_inline, config_local string) (
 	return
 }
 
-func (c *Client) Apply(api_server, namespace, config_inline, config_local, baseDir string) (err error) {
-	opts, _ := createBaseOpts(api_server, namespace, config_inline, config_local)
+func (c *Client) Apply(api_server, namespace, config, config_override, baseDir string) (err error) {
+	opts, _ := createBaseOpts(api_server, namespace, config, config_override)
 
 	var applyOpts tanka.ApplyOpts
 	applyOpts.ApplyBaseOpts = opts
@@ -100,8 +99,8 @@ func (c *Client) Apply(api_server, namespace, config_inline, config_local, baseD
 	return
 }
 
-func (c *Client) Delete(api_server, namespace, config_inline, config_local, baseDir string) (err error) {
-	opts, _ := createBaseOpts(api_server, namespace, config_inline, config_local)
+func (c *Client) Delete(api_server, namespace, config, config_override, baseDir string) (err error) {
+	opts, _ := createBaseOpts(api_server, namespace, config, config_override)
 
 	var deleteOpts tanka.DeleteOpts
 	deleteOpts.ApplyBaseOpts = opts
@@ -114,7 +113,7 @@ func (c *Client) Delete(api_server, namespace, config_inline, config_local, base
 	return
 }
 
-func (c *Client) getLocalConfig(config_input string) (config string, err error) {
+func (c *Client) parseConfig(config_input string) (config string, err error) {
 
 	config_type := "json"
 	if strings.Contains(config_input, "://") {
@@ -141,7 +140,7 @@ func (c *Client) getLocalConfig(config_input string) (config string, err error) 
 		}
 		config = string(raw[:])
 	default:
-		err = fmt.Errorf("unknown protocol used in config_local")
+		err = fmt.Errorf("unknown protocol used in config")
 		return
 	}
 

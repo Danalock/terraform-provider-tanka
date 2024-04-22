@@ -2,13 +2,15 @@ local k = import 'github.com/grafana/jsonnet-libs/ksonnet-util/kausal.libsonnet'
 
 local configMap = k.core.v1.configMap;
 
-function(apiServer, namespace, config_inline = {}, config_local = {}) {
+function(apiServer, namespace, config={}, config_override={}) {
 
-  local config = {
-    "key_jsonnet_default": "testvalue"
-  } + config_inline + config_local,
+  local default = {
+    key_default: 'value only existing in default',
+  },
+  local override = std.mergePatch(config, config_override),
+  local conf = std.mergePatch(default, override),
 
-  trace: std.trace("obj config: %s" % [config], config),
+  trace: std.trace('obj config: %s' % [conf], conf),
 
   apiVersion: 'tanka.dev/v1alpha1',
   kind: 'Environment',
@@ -23,11 +25,12 @@ function(apiServer, namespace, config_inline = {}, config_local = {}) {
 
   data: {
     terraformprovidertest: configMap.new('terraformprovidertest', {
-      'key_jsonnet_default': config.key_jsonnet_default,
-      // 'key_inline': config.key_inline,
-      'key_local': config.key_local,
-      'key_1': config.key_1,
-      // 'key_2': config.key_2,
+      "key_default": conf.key_default,
+      "key_1": conf.key_1,
+      "key_2": conf.key_2,
+      "key_list_item": conf.key_list[2],
+      "key_nested_item": conf.key_nested.new.deep,
+      "key_override": conf.key_override,
     }),
   },
 }

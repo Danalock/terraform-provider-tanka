@@ -1,3 +1,4 @@
 {
-  "key_2": "value from file"
+  "key_2": "overridden value from file",
+  "key_override": "value_only_existing_in_override"
 }
