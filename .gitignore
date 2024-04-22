@@ -3,7 +3,7 @@
 .DS_Store
 example.tf
 terraform.tfplan
-terraform.tfstate
+config.auto.tfvars
 bin/
 dist/
 modules-dev/
@@ -15,7 +15,9 @@ website/node_modules
 .vagrant/
 *.backup
 ./*.tfstate
+terraform.tfstate*
 .terraform/
+.terraform*
 *.log
 *.bak
 *~
@@ -34,15 +36,5 @@ website/vendor
 # Keep windows files with windows line endings
 *.winfile eol=crlf
 
-
-
-
-log.txt
-terraform.tfstate*
-terraform-provider-tanka
-terraform-provider-tanka.git
-.terraform*
-config.auto.tfvars
-
-dist/
-old/
+# The generated binary when developing locally
+terraform-provider-tanka*

@@ -10,7 +10,6 @@ import (
 
 	"github.com/Danalock/terraform-provider-tanka.git/internal/provider"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
-	// "github.com/hashicorp/terraform-provider-scaffolding-framework/internal/provider"
 )
 
 // Run "go generate" to format example terraform files and generate the docs for the registry/website
@@ -39,7 +38,6 @@ func main() {
 	flag.Parse()
 
 	opts := providerserver.ServeOpts{
-		// TODO: Update this string with the published name of your provider.
 		// Also update the tfplugindocs generate command to either remove the
 		// -provider-name flag or set its value to the updated provider name.
 		Address: "registry.terraform.io/Danalock/tanka",

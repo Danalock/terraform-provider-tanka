@@ -9,7 +9,3 @@ variable "cluster_ca_certificate" {
 variable "token" {
   type = string
 }
-
-variable "namespace" {
-  type = string
-}
