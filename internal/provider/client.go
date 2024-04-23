@@ -67,7 +67,7 @@ func (c *Client) setCredentials() {
 	}
 }
 
-func createBaseOpts(api_server, namespace, config, config_override string) (opts tanka.ApplyBaseOpts, err error) {
+func createBaseOpts(api_server, namespace, config, config_override string) (opts tanka.ApplyBaseOpts) {
 
 	var TLACode jsonnet.InjectedCode
 	TLACode.Set("apiServer", "\""+api_server+"\"")
@@ -84,7 +84,7 @@ func createBaseOpts(api_server, namespace, config, config_override string) (opts
 }
 
 func (c *Client) Apply(api_server, namespace, config, config_override, baseDir string) (err error) {
-	opts, _ := createBaseOpts(api_server, namespace, config, config_override)
+	opts := createBaseOpts(api_server, namespace, config, config_override)
 
 	var applyOpts tanka.ApplyOpts
 	applyOpts.ApplyBaseOpts = opts
@@ -100,7 +100,7 @@ func (c *Client) Apply(api_server, namespace, config, config_override, baseDir s
 }
 
 func (c *Client) Delete(api_server, namespace, config, config_override, baseDir string) (err error) {
-	opts, _ := createBaseOpts(api_server, namespace, config, config_override)
+	opts := createBaseOpts(api_server, namespace, config, config_override)
 
 	var deleteOpts tanka.DeleteOpts
 	deleteOpts.ApplyBaseOpts = opts

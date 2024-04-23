@@ -5,7 +5,6 @@ package provider
 
 import (
 	"context"
-	// "encoding/json"
 	"fmt"
 	"time"
 
@@ -74,19 +73,19 @@ func (r *TankaReleaseResource) Schema(ctx context.Context, req resource.SchemaRe
 			},
 			"config": schema.StringAttribute{
 				MarkdownDescription: "Configuration object in arbitrary JSON format. The data can be provided inline with jsonencode() or given as a file. Local file paths are prefixed with `file://` and remote sources with the correct protocol `http://` or `https://`. Remote sources must be publicly available. Defaults to the empty object.",
-				Optional: true,
-				Computed: true,
-				Default:  stringdefault.StaticString("{}"),
+				Optional:            true,
+				Computed:            true,
+				Default:             stringdefault.StaticString("{}"),
 			},
 			"config_override": schema.StringAttribute{
 				MarkdownDescription: "Configuration override object in arbitrary JSON format. The data can be provided inline with jsonencode() or given as a file. Local file paths are prefixed with `file://` and remote sources with the correct protocol `http://` or `https://`. Remote sources must be publicly available. Defaults to the empty object.",
-				Optional: true,
-				Computed: true,
-				Default:  stringdefault.StaticString("{}"),
+				Optional:            true,
+				Computed:            true,
+				Default:             stringdefault.StaticString("{}"),
 			},
 			"last_updated": schema.StringAttribute{
 				MarkdownDescription: "Timestamp updated on every apply operation.",
-				Computed: true,
+				Computed:            true,
 			},
 			"id": schema.StringAttribute{
 				Computed:            true,
