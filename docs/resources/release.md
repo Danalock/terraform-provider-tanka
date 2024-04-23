@@ -15,11 +15,13 @@ The `tanka_release` resource describes the desired status of the Tanka Package.
 
 Configuration is passed in either `config` or `config_override`.
 
+Both `config` and `config_override` are json objects given either directly in the resource definition by parsing through `jsonencode()` or by loading a file from either a local (by prefixing with `file://`) or remote (by prefixing with `http://` or `https://`) source. The remote sources must be publicly accessible, at this time there is no mechanism for providing authentication credentials to the remote server.
+
 This structure is born out of a need to be able to set default configuration at both the jsonnet and terraform level along with the option to let environments override config in the ci/cd pipeline.
 
 Both config vars, together with `api_server` and `namespace` are passed to tanka as tla-code vars.
 
-This structure assumes that the tanka package is configured with [inline environments](https://tanka.dev/inline-environments) in order to dynamically set the `api_server` and `namespace`. A minimal setup for `main.jsonnet` using this provider could look like this:
+This provider assumes that the tanka package is configured with [inline environments](https://tanka.dev/inline-environments) in order to dynamically set the `api_server` and `namespace`. It is also assumed that only one tanka environment is used (even though it might be able to configure multiple - it hasn't been tested). A minimal setup for `main.jsonnet` using this provider could look like this:
 
 ```jsonnet
 function(apiServer, namespace, config={}, config_override={}) {
@@ -48,8 +50,6 @@ function(apiServer, namespace, config={}, config_override={}) {
 Using the std.mergePatch() function from the jsonnet standard library ensures that nested json objects are deep merged and not overwritten if identical keys are found.
 
 Note the camelCase in `apiServer` in the jsonnet context.
-
-Both `config` and `config_override` are json objects given either directly in the resource definition by parsing through `jsonencode()` or by loading a file from either a local (by prefixing with `file://`) or remote (by prefixing with `http://` or `https://`) source. The remote sources must be publicly accessible, at this time there is no mechanism for providing authentication credentials to the remote server.
 
 ## Example Usage
 
