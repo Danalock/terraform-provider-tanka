@@ -1,0 +1,28 @@
+---
+page_title: "{{.ProviderShortName}} provider"
+subcategory: ""
+description: |-
+{{ .Description | plainmarkdown | trimspace | prefixlines "  " }}
+---
+
+# {{.ProviderShortName}} provider
+
+{{ .Description | trimspace }}
+
+This is an unofficial [Tanka](https://github.com/grafana/tanka) provider for [Terraform](https://www.terraform.io/).
+
+This provider allows you to install and manage Tanka ressources in a Kubernetes cluster using Terraform.
+
+The provider needs to be configured with the cluster API server endpoint, the CA certificate and a token for the user entry.
+
+When configured, the provider will update the kubeconfig on the running system with these credentials. Tanka looks in this file for credentials when given just the endpoint.
+
+*Note:* The kubeconfig is not cleaned up after operation.
+
+{{ if .HasExample -}}
+## Example Usage
+
+{{tffile .ExampleFile }}
+{{- end }}
+
+{{ .SchemaMarkdown | trimspace }}
