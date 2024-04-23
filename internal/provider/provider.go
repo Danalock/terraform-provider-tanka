@@ -42,7 +42,7 @@ func (p *TankaProvider) Schema(ctx context.Context, req provider.SchemaRequest, 
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"endpoint": schema.StringAttribute{
-				MarkdownDescription: "The kubernetes cluster endpoint",
+				MarkdownDescription: "The kubernetes cluster endpoint / the API server",
 				Required:            true,
 			},
 			"cluster_ca_certificate": schema.StringAttribute{

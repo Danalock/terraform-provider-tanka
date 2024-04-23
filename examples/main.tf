@@ -1,3 +1,5 @@
+// Runnable example used in development
+
 variable "endpoint" {
   type = string
 }
@@ -41,7 +43,7 @@ resource "tanka_release" "example" {
   })
   # config_override = "file://tanka_config_override.json"
   config_override = jsonencode({
-    key_1        = "overridden_value_1",
-    key_override = "value_only_existing_in_override",
+    key_1 : "overridden_value_1"
+    key_override : "value_only_existing_in_override"
   })
 }

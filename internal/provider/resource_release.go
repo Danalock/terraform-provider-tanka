@@ -55,39 +55,42 @@ func (r *TankaReleaseResource) Schema(ctx context.Context, req resource.SchemaRe
 
 		Attributes: map[string]schema.Attribute{
 			"namespace": schema.StringAttribute{
-				MarkdownDescription: "The cluster namespace to apply against",
+				MarkdownDescription: "The Kubernetes namespace to install the release into. Defaults to `default`.",
 				Optional:            true,
 				Computed:            true,
 				Default:             stringdefault.StaticString("default"),
 			},
 			"version": schema.StringAttribute{
-				MarkdownDescription: "The release version",
+				MarkdownDescription: "A version number for the Tanka package. Examples could be a git commit SHA, or a random value to force update on every run. This value is not passed to the tanka application, if version information needs to be available to tanka it should be set as a subkey in one of the config objects.",
 				Optional:            true,
 				Computed:            true,
 				Default:             stringdefault.StaticString("0"),
 			},
 			"source_path": schema.StringAttribute{
-				MarkdownDescription: "Path to Tanka source",
+				MarkdownDescription: "The location of the Tanka main file. Defaults to `tanka/environments/default`.",
 				Optional:            true,
 				Computed:            true,
 				Default:             stringdefault.StaticString("tanka/environments/default"),
 			},
 			"config": schema.StringAttribute{
+				MarkdownDescription: "Configuration object in arbitrary JSON format. The data can be provided inline with jsonencode() or given as a file. Local file paths are prefixed with `file://` and remote sources with the correct protocol `http://` or `https://`. Remote sources must be publicly available. Defaults to the empty object.",
 				Optional: true,
 				Computed: true,
 				Default:  stringdefault.StaticString("{}"),
 			},
 			"config_override": schema.StringAttribute{
+				MarkdownDescription: "Configuration override object in arbitrary JSON format. The data can be provided inline with jsonencode() or given as a file. Local file paths are prefixed with `file://` and remote sources with the correct protocol `http://` or `https://`. Remote sources must be publicly available. Defaults to the empty object.",
 				Optional: true,
 				Computed: true,
 				Default:  stringdefault.StaticString("{}"),
 			},
 			"last_updated": schema.StringAttribute{
+				MarkdownDescription: "Timestamp updated on every apply operation.",
 				Computed: true,
 			},
 			"id": schema.StringAttribute{
 				Computed:            true,
-				MarkdownDescription: "Identifier",
+				MarkdownDescription: "The ID of the resource. Consists of the cluster endpoint suffixed with a six letter random string (underscore separated).",
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},
