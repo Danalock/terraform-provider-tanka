@@ -1,3 +1,7 @@
+# github.com/BurntSushi/toml v1.2.1
+## explicit; go 1.16
+github.com/BurntSushi/toml
+github.com/BurntSushi/toml/internal
 # github.com/Kunde21/markdownfmt/v3 v3.1.0
 ## explicit; go 1.18
 github.com/Kunde21/markdownfmt/v3/markdown
@@ -49,6 +53,9 @@ github.com/armon/go-radix
 # github.com/bgentry/speakeasy v0.1.0
 ## explicit
 github.com/bgentry/speakeasy
+# github.com/bmatcuk/doublestar/v4 v4.6.1
+## explicit; go 1.16
+github.com/bmatcuk/doublestar/v4
 # github.com/cloudflare/circl v1.3.7
 ## explicit; go 1.19
 github.com/cloudflare/circl/dh/x25519
@@ -172,16 +179,17 @@ github.com/hashicorp/terraform-exec/tfexec
 # github.com/hashicorp/terraform-json v0.21.0
 ## explicit; go 1.18
 github.com/hashicorp/terraform-json
-# github.com/hashicorp/terraform-plugin-docs v0.18.0
-## explicit; go 1.19
+# github.com/hashicorp/terraform-plugin-docs v0.19.1
+## explicit; go 1.21
 github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs
 github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs/build
-github.com/hashicorp/terraform-plugin-docs/functionmd
+github.com/hashicorp/terraform-plugin-docs/internal/check
 github.com/hashicorp/terraform-plugin-docs/internal/cmd
+github.com/hashicorp/terraform-plugin-docs/internal/functionmd
 github.com/hashicorp/terraform-plugin-docs/internal/mdplain
 github.com/hashicorp/terraform-plugin-docs/internal/provider
+github.com/hashicorp/terraform-plugin-docs/internal/schemamd
 github.com/hashicorp/terraform-plugin-docs/internal/tmplfuncs
-github.com/hashicorp/terraform-plugin-docs/schemamd
 # github.com/hashicorp/terraform-plugin-framework v1.7.0
 ## explicit; go 1.21
 github.com/hashicorp/terraform-plugin-framework/attr
@@ -302,9 +310,6 @@ github.com/rs/zerolog
 github.com/rs/zerolog/internal/cbor
 github.com/rs/zerolog/internal/json
 github.com/rs/zerolog/log
-# github.com/russross/blackfriday v1.6.0
-## explicit; go 1.13
-github.com/russross/blackfriday
 # github.com/shopspring/decimal v1.3.1
 ## explicit; go 1.13
 github.com/shopspring/decimal
@@ -326,8 +331,8 @@ github.com/vmihailenco/msgpack/v5/msgpcode
 github.com/vmihailenco/tagparser/v2
 github.com/vmihailenco/tagparser/v2/internal
 github.com/vmihailenco/tagparser/v2/internal/parser
-# github.com/yuin/goldmark v1.6.0
-## explicit; go 1.18
+# github.com/yuin/goldmark v1.7.0
+## explicit; go 1.19
 github.com/yuin/goldmark
 github.com/yuin/goldmark/ast
 github.com/yuin/goldmark/extension
@@ -345,6 +350,9 @@ github.com/yuin/goldmark-meta
 github.com/zclconf/go-cty/cty
 github.com/zclconf/go-cty/cty/ctystrings
 github.com/zclconf/go-cty/cty/set
+# go.abhg.dev/goldmark/frontmatter v0.2.0
+## explicit; go 1.20
+go.abhg.dev/goldmark/frontmatter
 # golang.org/x/crypto v0.22.0
 ## explicit; go 1.18
 golang.org/x/crypto/argon2
