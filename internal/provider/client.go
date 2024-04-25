@@ -72,8 +72,8 @@ func createBaseOpts(api_server, namespace, config, config_override string) (opts
 	var TLACode jsonnet.InjectedCode
 	TLACode.Set("apiServer", "\""+api_server+"\"")
 	TLACode.Set("namespace", "\""+namespace+"\"")
-	TLACode.Set("config", config)
-	TLACode.Set("config_override", config_override)
+	TLACode.Set("tf_config", config)
+	TLACode.Set("tf_config_override", config_override)
 	opts.TLACode = TLACode
 
 	opts.AutoApprove = "true"

@@ -27,7 +27,7 @@ provider "tanka" {
 }
 
 resource "tanka_release" "example" {
-  version = "456"
+  version = "1"
   config = jsonencode({
     key_1 : "value_1"
     key_2 : "value_2"
