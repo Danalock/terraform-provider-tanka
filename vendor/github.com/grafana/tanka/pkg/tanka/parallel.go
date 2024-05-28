@@ -30,12 +30,25 @@ func parallelLoadEnvironments(envs []*v1alpha1.Environment, opts parallelOpts) (
 		opts.Parallelism = defaultParallelism
 	}
 
+	if opts.Parallelism > len(envs) {
+		log.Info().Int("parallelism", opts.Parallelism).Int("envs", len(envs)).Msg("Reducing parallelism to match number of environments")
+		opts.Parallelism = len(envs)
+	}
+
 	for i := 0; i < opts.Parallelism; i++ {
 		go parallelWorker(jobsCh, outCh)
 	}
 
 	for _, env := range envs {
 		o := opts.Opts
+
+		if env.Spec.ExportJsonnetImplementation != "" {
+			log.Trace().
+				Str("name", env.Metadata.Name).
+				Str("implementation", env.Spec.ExportJsonnetImplementation).
+				Msg("Using custom Jsonnet implementation")
+			o.JsonnetImplementation = env.Spec.ExportJsonnetImplementation
+		}
 
 		// TODO: This is required because the map[string]string in here is not
 		// concurrency-safe. Instead of putting this burden on the caller, find
