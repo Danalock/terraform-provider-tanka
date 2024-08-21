@@ -36,7 +36,7 @@ jobs:
         with:
           args: release --clean
           distribution: goreleaser
-          version: latest
+          version: '~> v2'
         env:
           # GitHub sets the GITHUB_TOKEN secret automatically.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
