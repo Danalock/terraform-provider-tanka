@@ -116,7 +116,7 @@ func (c *Client) Delete(api_server, namespace, config, config_override, baseDir 
 func (c *Client) parseConfig(config_input string) (config string, err error) {
 
 	config_type := "json"
-	if strings.Contains(config_input, "://") {
+	if strings.HasPrefix(config_input, "http://") || strings.HasPrefix(config_input, "https://") || strings.HasPrefix(config_input, "file://") {
 		split := strings.Split(config_input, "://")
 		config_type = split[0]
 	}
