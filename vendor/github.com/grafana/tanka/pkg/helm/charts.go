@@ -58,6 +58,29 @@ func LoadChartfile(projectRoot string) (*Charts, error) {
 	return charts, nil
 }
 
+// LoadHelmRepoConfig reads in a helm config file
+func LoadHelmRepoConfig(repoConfigPath string) (*ConfigFile, error) {
+	// make sure path is valid
+	repoPath, err := filepath.Abs(repoConfigPath)
+	if err != nil {
+		return nil, err
+	}
+
+	// open repo config file
+	data, err := os.ReadFile(repoPath)
+	if err != nil {
+		return nil, err
+	}
+
+	// parse the file non-strictly to account for any minor config changes
+	rc := &ConfigFile{}
+	if err := yaml.Unmarshal(data, rc); err != nil {
+		return nil, err
+	}
+
+	return rc, nil
+}
+
 // Charts exposes the central Chartfile management functions
 type Charts struct {
 	// Manifest are the chartfile.yaml contents. It holds data about the developers intentions
@@ -89,9 +112,14 @@ func (c Charts) ManifestFile() string {
 
 // Vendor pulls all Charts specified in the manifest into the local charts
 // directory. It fetches the repository index before doing so.
-func (c Charts) Vendor(prune bool) error {
+func (c Charts) Vendor(prune bool, repoConfigPath string) error {
 	dir := c.ChartDir()
 	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
+		return err
+	}
+
+	repositories, err := c.getRepositories(repoConfigPath)
+	if err != nil {
 		return err
 	}
 
@@ -154,19 +182,19 @@ func (c Charts) Vendor(prune bool) error {
 
 		if !repositoriesUpdated {
 			log.Info().Msg("Syncing Repositories ...")
-			if err := c.Helm.RepoUpdate(Opts{Repositories: c.Manifest.Repositories}); err != nil {
+			if err := c.Helm.RepoUpdate(Opts{Repositories: repositories}); err != nil {
 				return err
 			}
 			repositoriesUpdated = true
 		}
 		log.Info().Msg("Pulling Charts ...")
-		if repoName := parseReqRepo(r.Chart); !c.Manifest.Repositories.HasName(repoName) {
+		if repoName := parseReqRepo(r.Chart); !repositories.HasName(repoName) {
 			return fmt.Errorf("repository %q not found for chart %q", repoName, r.Chart)
 		}
 		err := c.Helm.Pull(r.Chart, r.Version, PullOpts{
 			Destination:      dir,
 			ExtractDirectory: r.Directory,
-			Opts:             Opts{Repositories: c.Manifest.Repositories},
+			Opts:             Opts{Repositories: repositories},
 		})
 		if err != nil {
 			return err
@@ -199,7 +227,7 @@ func (c Charts) Vendor(prune bool) error {
 
 // Add adds every Chart in reqs to the Manifest after validation, and runs
 // Vendor afterwards
-func (c *Charts) Add(reqs []string) error {
+func (c *Charts) Add(reqs []string, repoConfigPath string) error {
 	log.Info().Msgf("Adding %v Charts ...", len(reqs))
 
 	// parse new charts, append in memory
@@ -238,7 +266,7 @@ func (c *Charts) Add(reqs []string) error {
 
 	// worked fine? vendor it
 	log.Info().Msgf("Added %v Charts to helmfile.yaml. Vendoring ...", added)
-	return c.Vendor(false)
+	return c.Vendor(false, repoConfigPath)
 }
 
 func (c *Charts) AddRepos(repos ...Repo) error {
@@ -269,6 +297,50 @@ func (c *Charts) AddRepos(repos ...Repo) error {
 	}
 
 	return nil
+}
+
+// VersionCheck checks each of the charts in the requires section and returns information regarding
+// related to version upgrades. This includes if the current version is latest as well as the
+// latest matching versions of the major and minor version the chart is currently on.
+func (c *Charts) VersionCheck(repoConfigPath string) (map[string]RequiresVersionInfo, error) {
+	requiresVersionInfo := make(map[string]RequiresVersionInfo)
+	repositories, err := c.getRepositories(repoConfigPath)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, r := range c.Manifest.Requires {
+		searchVersions, err := c.Helm.SearchRepo(r.Chart, r.Version, Opts{Repositories: repositories})
+		if err != nil {
+			return nil, err
+		}
+		usingLatestVersion := r.Version == searchVersions[0].Version
+
+		requiresVersionInfo[fmt.Sprintf("%s@%s", r.Chart, r.Version)] = RequiresVersionInfo{
+			Name:                       r.Chart,
+			Directory:                  r.Directory,
+			CurrentVersion:             r.Version,
+			UsingLatestVersion:         usingLatestVersion,
+			LatestVersion:              searchVersions[0],
+			LatestMatchingMajorVersion: searchVersions[1],
+			LatestMatchingMinorVersion: searchVersions[2],
+		}
+	}
+
+	return requiresVersionInfo, nil
+}
+
+// getRepositories will dynamically return the repositores either loaded from the given
+// repoConfigPath file or from the existing manifest.
+func (c *Charts) getRepositories(repoConfigPath string) (Repos, error) {
+	if repoConfigPath != "" {
+		repoConfig, err := LoadHelmRepoConfig(repoConfigPath)
+		if err != nil {
+			return nil, err
+		}
+		return repoConfig.Repositories, nil
+	}
+	return c.Manifest.Repositories, nil
 }
 
 func InitChartfile(path string) (*Charts, error) {
